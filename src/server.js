@@ -28,7 +28,15 @@ app.post('/monitoring_event', (req, res) => {
     }
 
     return res.json({ success: true })
+  })
+})
 
+app.get('/monitoring_event', (req, res) => {
+  MonitoringEventModel.find({}, (err, events) => {
+    if(err){
+      return res.status(500).send({ err })
+    }
+    return res.status(200).send(events)
   })
 
 })

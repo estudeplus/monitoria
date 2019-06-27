@@ -10,7 +10,8 @@ const MonitoringEventSchema = new Schema({
     class: { type: String, required: true }
   },
   place: { type: String, required: true },
-  datetime: { type: Date, required: true }
+  datetime: { type: Date, required: true },
+  __v: { type: Number, select: false },
 }, { collection: 'monitoringEvent' });
 
 module.exports = mongoose.model('MonitoringEventModel', MonitoringEventSchema);
