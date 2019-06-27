@@ -9,7 +9,7 @@ const MonitoringEventSchema = new Schema({
     name: { type: String, required: true },
     class: { type: String, required: true }
   },
-  place: { type: String, required: true }
+  place: { type: String, required: true },
   datetime: { type: Date, required: true }
 }, { collection: 'monitoringEvent' });
 
