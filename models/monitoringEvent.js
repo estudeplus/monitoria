@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const MonitoringEventSchema = new Schema({
-  studentId: { type: String, required: true },
+  studentsIds: { type: Array, required: true },
   monitorId: { type: String, required: true },
   discipline: { 
     id: { type: String, required: true },

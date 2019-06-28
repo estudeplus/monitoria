@@ -8,7 +8,6 @@ const MonitoringEventModel = require('../models/monitoringEvent.js')
 
 const PORT = 3000
 
-
 const app = express()
 
 app.use(bodyParser());
@@ -51,6 +50,31 @@ app.get('/monitoring_event/:id', (req, res) => {
     })
 })
 
+
+app.put('/monitoring_event/:id', (req, res) => {
+  MonitoringEventModel.findById(req.params.id)
+    .then((event) => {
+      if(!event) {
+        return res.status(404).send({
+          error: 'Event not found'
+        })
+      }
+
+      event.place = req.body.place
+      event.datetime = req.body.datetime
+
+      event.save((err) => {
+        if(err){
+          return res.status(400).send(err)
+        }
+        return res.status(201).send(event)
+      })
+    })
+    .catch((err) => {
+      return res.status(500).send(err)
+    })
+})
+
 app.get('/monitoring_event', (req, res) => {
   MonitoringEventModel.find({}, (err, events) => {
     if(err){
@@ -60,6 +84,7 @@ app.get('/monitoring_event', (req, res) => {
   })
 
 })
+
 
 app.listen(PORT, async () => {
     try {
