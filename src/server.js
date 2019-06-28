@@ -31,6 +31,26 @@ app.post('/monitoring_event', (req, res) => {
   })
 })
 
+app.get('/monitoring_event/:id', (req, res) => {
+  MonitoringEventModel.findById(req.params.id)
+    .then((event) => {
+      if(!event) {
+        return res.status(404).send({
+          error: 'Event not found'
+        })
+      }
+
+      return res.status(200).send(event)
+    })
+    .catch((err) => {
+      if(err.kind === 'ObjectId') {
+        return res.status(400).send(err)
+      }
+
+      return res.status(500).send(err)
+    })
+})
+
 app.get('/monitoring_event', (req, res) => {
   MonitoringEventModel.find({}, (err, events) => {
     if(err){
