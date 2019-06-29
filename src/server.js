@@ -5,6 +5,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 
 const MonitoringEventModel = require('../models/monitoringEvent.js')
+const MonitoringEventSerializer = require('./serializers.js')
 
 const PORT = 3000
 
@@ -18,16 +19,22 @@ app.get('/', (req, res) => {
 
 app.post('/monitoring_event', (req, res) => {
 
-  let monitoringEvent = MonitoringEventModel(req.body)
+  let monitoringEvent = new MonitoringEventSerializer(req.body)
 
-  monitoringEvent.save((err) => {
+  let valid = monitoringEvent.validate()
 
-    if(err && err.name === 'ValidationError') {
-      return res.status(400).send({ err })
-    }
-
-    return res.json({ success: true })
-  })
+  if(valid) {
+    monitoringEvent.save()
+      .then(() => {
+        return res.status(201).send({ success: true })
+      })
+      .catch((err) => {
+        return res.status(500).send(err.message)
+      })
+  }
+  else{
+    return res.status(400).send({errors: monitoringEvent.errors()})
+  }
 })
 
 app.get('/monitoring_event/:id', (req, res) => {
