@@ -20,7 +20,6 @@ app.get('/', (req, res) => {
 app.post('/monitoring_event', (req, res) => {
 
   let monitoringEvent = new MonitoringEventSerializer(req.body)
-
   let valid = monitoringEvent.validate()
 
   if(valid) {
@@ -67,18 +66,21 @@ app.put('/monitoring_event/:id', (req, res) => {
         })
       }
 
-      event.place = req.body.place
-      event.datetime = req.body.datetime
+      let monitoringEvent = new MonitoringEventSerializer(req.body, event)
+      let valid = monitoringEvent.validate()
 
-      event.save((err) => {
-        if(err){
-          return res.status(400).send(err)
-        }
-        return res.status(201).send(event)
-      })
-    })
-    .catch((err) => {
-      return res.status(500).send(err)
+      if(valid) {
+        monitoringEvent.save()
+          .then(() => {
+            return res.status(201).send({ success: true })
+          })
+          .catch((err) => {
+            return res.status(500).send(err.message)
+          })
+      }
+      else{
+        return res.status(400).send({errors: monitoringEvent.errors()})
+      }
     })
 })
 
