@@ -95,6 +95,28 @@ app.get('/monitoring_event', (req, res) => {
 })
 
 
+app.post('/register_monitoring/:id', (req, res) => {
+  MonitoringEventModel.findById(req.params.id)
+    .then((event) => {
+      if(!event) {
+        return res.status(404).send({
+          error: 'Event not found'
+        })
+      }
+
+      event.studentsIds.push(req.body.studentsIds)
+
+      event.save((err) => {
+        if(err && err.name === 'ValidationError') {
+          return res.status(400).send({ err })
+        }
+
+        return res.json({ success: true })
+      })
+    })
+})
+
+
 app.listen(PORT, async () => {
     try {
         await startMongo()
