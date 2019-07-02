@@ -1,0 +1,33 @@
+sudo: required
+services:
+- docker
+cache:
+  directories:
+  - "$HOME/google-cloud-sdk/"
+env:
+  global:
+  - GOOGLE_APPLICATION_CREDENTIALS=$TRAVIS_BUILD_DIR/deploy/gcloud-key.json
+  - ORG_NAME=estudeplus
+  - IMAGE_NAME=monitoria
+  - DEPLOYMENT=monitoria-deploy
+  - CONTAINER=monitoria-container
+  - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+  - secure: CfiSlkLZad85AAfnyEN36W8cOvBJuKvaLO9QfnnPJ6BLDDMifkA/vfrCtI2/Xp4UYHkQaOZJzNF37Yuvy+yfsLHHKWku2HAtuBXnPmKY3sGAwr3wU6+N71ruHk8+HBkfAZvE+Qo7J2f3bxijxbXhPE7IkNwLW8jgYBD0t65mE5YriinssRPHQPJLV6arGFubXrFmDv4pxgKY25laLu+Y2MmSjVPW2jbynxJ3x2bDsHKfEEfkVbvXLzAbbDpYb062PD3YZ7jdWvRuMwJGG2zpcTW6W+7nc2za1tf0jZ+Vwx1v475izTmNLO7esZIwIMVg+BfXYzdxFjiMzQgVsPhPLQjBeUHRO/NfW7QnhKF0fM6B/2wMHtxFBZMQr4BqiHbgfPoESvIDCQkPzddsjKfwVOyRNAg+u7AGM0wqEtczTFAJOcB3h5piTrfDCwkzQQjfX2xZY06o4rl00VMg0hJaCwLkvJRVPCVfj7ua6qmr1OsWvXqP6fp4f6UCkutVe7ipoqRx5LmRqFUa7j7IC4oNoFl2pJaCrIzW7BGTgmVPFN/MafsaI+DyHU5rKloZ2ToVizW+wQEG3j220OL9CAcuGhawl+ESHKFyfDm3LYlSUpV4Wa1ugxVG2p8fNs8Lgv1Ym5psL9eUfL+DUKzavSdZm7ps/hu08pHM0noc6x2vI8w=
+script:
+- docker build -t ${ORG_NAME}/${IMAGE_NAME}:$TRAVIS_COMMIT .
+before_deploy:
+- if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; curl
+  https://sdk.cloud.google.com | bash > /dev/null; fi
+- source $HOME/google-cloud-sdk/path.bash.inc
+- gcloud --quiet components update kubectl
+deploy:
+- provider: script
+  script: chmod +x deploy/deploy.sh && bash deploy/deploy.sh
+  skip_cleanup: true
+  on:
+    branch: master
+notifications:
+  email: false
+before_install:
+- openssl aes-256-cbc -K $encrypted_d7a0c12bf597_key -iv $encrypted_d7a0c12bf597_iv
+  -in deploy/gcloud-key.json.enc -out deploy/gcloud-key.json -d

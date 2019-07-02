@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoria 
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 3000 
+      targetPort: 3000
+  selector:
+    app: monitoria 
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: monitoria-deploy 
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: monitoria 
+    spec:
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: monitoria-config
+            optional: false
+        image: estudeplus/monitoria
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: 3000
+            scheme: HTTP
+        name: monitoria-container
+        ports:
+          - containerPort: 3000

@@ -3,6 +3,7 @@
 const startMongo = require('../config/mongo.js')
 const express = require('express')
 const bodyParser = require('body-parser')
+const cors = require('cors')
 
 const MonitoringEventModel = require('../models/monitoringEvent.js')
 const MonitoringEventSerializer = require('./serializers.js')
@@ -12,6 +13,7 @@ const PORT = 3000
 const app = express()
 
 app.use(bodyParser());
+app.use(cors())
 
 app.get('/', (req, res) => {
   return res.status(200).send({status: 'ok'})
